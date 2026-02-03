@@ -1,5 +1,6 @@
 #include <U8g2lib.h>
 
+// ====
 #define T_WIDTH 4    // Tetromino width
 #define T_HEIGHT 4   // Tetromino height
 #define A_WIDTH 8    // Arena width
@@ -24,7 +25,7 @@ const int tetrominoes[7][16] = {
   { 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0 },  //Z
   { 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0 },  //T
   { 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0 },  //L
-  { 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0 }   // J
+  { 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0 }   //J
 };
 
 bool game_over = false;
@@ -42,7 +43,8 @@ bool moveDown();
 void merge_piece();
 void check_lines();
 void handle_controlls();
-
+void draw_gameover_page();
+void restart_game();
 
 void setup() {
   u8g2.begin();
@@ -79,9 +81,32 @@ void loop() {
     delay(50);
 
   } else{
-    
+    draw_gameover_page();
+
+    if(digitalRead(BTN_ACTION) == LOW||digitalRead(BTN_DOWN)==LOW||digitalRead(BTN_LEFT)==LOW||digitalRead(BTN_RIGHT)==LOW){
+      delay(200); // Debounce
+      
+      restart_game();
+      draw_game();
+    }
   }
 
+}
+
+void restart_game(){
+
+  for(int y =0; y<A_HEIGHT; y++){
+    for(int x=0; x<A_WIDTH; x++){
+      arena[y][x]=0;
+    }
+  }
+
+  game_over=false;
+  score=0;
+  lastDropTime=0;
+  currRotation=0;
+
+  new_piece();
 
 }
 
@@ -208,7 +233,7 @@ void draw_blocks() {
 }
 
 void handle_controlls() {
-  //action button - rotating (با دیبانس ساده)
+  //action button - rotating
   static unsigned long lastActionTime = 0;
   if (digitalRead(BTN_ACTION) == LOW && millis() - lastActionTime > 200) {
     int nextRotation = (currRotation + 1) % 4;
@@ -269,6 +294,15 @@ void draw_gameover_page(){
   u8g2.firstPage();
 
   do{
+
+    u8g2.setFont(u8g2_font_7x13_mf);
+    u8g2.drawStr(1, 20, "Game Over");
+      
+    // Draw restart prompt
+    u8g2.setFont(u8g2_font_5x7_mf);
+    u8g2.drawStr(6, 65, "Press any");
+    u8g2.drawStr(4, 74, "button to");
+    u8g2.drawStr(10, 83, "restart!");
 
   }while(u8g2.nextPage());
 }
