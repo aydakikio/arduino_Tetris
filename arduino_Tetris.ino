@@ -1,6 +1,5 @@
 #include <U8g2lib.h>
 
-// ====
 #define T_WIDTH 4    // Tetromino width
 #define T_HEIGHT 4   // Tetromino height
 #define A_WIDTH 8    // Arena width
@@ -85,7 +84,7 @@ void loop() {
 
     if(digitalRead(BTN_ACTION) == LOW||digitalRead(BTN_DOWN)==LOW||digitalRead(BTN_LEFT)==LOW||digitalRead(BTN_RIGHT)==LOW){
       delay(200); // Debounce
-      
+
       restart_game();
       draw_game();
     }
